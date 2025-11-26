@@ -1,0 +1,15 @@
+{
+  "name": "halalbazar",
+  "version": "1.0.0",
+  "description": "Halal Bazar Biryani Cost Calculator",
+  "scripts": {
+    "start": "node backend/server.js",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "heroku-postbuild": "npm run build"
+  },
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  }
+}

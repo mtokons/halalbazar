@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Orders collection
+    match /orders/{orderId} {
+      // Allow anyone to read orders
+      allow read: if true;
+      
+      // Allow anyone to create orders
+      allow create: if true;
+      
+      // Allow anyone to delete orders
+      allow delete: if true;
+      
+      // Allow anyone to update orders
+      allow update: if true;
+    }
+  }
+}
