@@ -5,7 +5,9 @@ import OrderForm from './components/OrderForm';
 import OrderHistory from './components/OrderHistory';
 import ResultDisplay from './components/ResultDisplay';
 import SupplierManagement from './components/Suppliers/SupplierManagement';
+import SupplierProfile from './components/Suppliers/SupplierProfile';
 import OrderManagement from './components/Orders/OrderManagement';
+import CustomerPortal from './components/Orders/CustomerPortal';
 import InventoryManagement from './components/Inventory/InventoryManagement';
 import HomePage from './components/Home/HomePage';
 import Reporting from './components/Reporting/Reporting';
@@ -112,7 +114,9 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/suppliers" element={<SupplierManagement />} />
+          <Route path="/suppliers/:supplierId" element={<SupplierProfile />} />
           <Route path="/orders" element={<OrderManagement />} />
+          <Route path="/customers/:customerId" element={<CustomerPortal />} />
           <Route path="/inventory" element={<InventoryManagement />} />
           <Route path="/reporting" element={<Reporting />} />
           <Route path="/calculator" element={<CalculatorPage />} />

@@ -92,7 +92,7 @@ function OrderForm({ onCalculationComplete, onNewCalculation }) {
 
         <div className="form-group">
           <label htmlFor="ingredientCost">
-            Ingredient Cost (₹)
+            Ingredient Cost (€)
           </label>
           <input
             type="number"
@@ -100,7 +100,7 @@ function OrderForm({ onCalculationComplete, onNewCalculation }) {
             name="ingredientCost"
             value={formData.ingredientCost}
             onChange={handleChange}
-            placeholder="e.g., 5000"
+            placeholder="e.g., 50.00"
             step="0.01"
             min="0"
             required
@@ -109,7 +109,7 @@ function OrderForm({ onCalculationComplete, onNewCalculation }) {
 
         <div className="form-group">
           <label htmlFor="electricityBill">
-            Electricity Bill (₹)
+            Electricity Bill (€)
           </label>
           <input
             type="number"
@@ -117,7 +117,7 @@ function OrderForm({ onCalculationComplete, onNewCalculation }) {
             name="electricityBill"
             value={formData.electricityBill}
             onChange={handleChange}
-            placeholder="e.g., 500"
+            placeholder="e.g., 5.00"
             step="0.01"
             min="0"
             required
@@ -126,7 +126,7 @@ function OrderForm({ onCalculationComplete, onNewCalculation }) {
 
         <div className="form-group">
           <label htmlFor="labourCost">
-            Labour Cost (₹)
+            Labour Cost (€)
           </label>
           <input
             type="number"
@@ -134,7 +134,7 @@ function OrderForm({ onCalculationComplete, onNewCalculation }) {
             name="labourCost"
             value={formData.labourCost}
             onChange={handleChange}
-            placeholder="e.g., 2000"
+            placeholder="e.g., 20.00"
             step="0.01"
             min="0"
             required

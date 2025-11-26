@@ -152,3 +152,34 @@ export const calculatorService = {
     return response.data;
   },
 };
+
+// ==================== SUPPLIER HISTORY ====================
+export const supplierHistoryService = {
+  getHistory: async (supplierId) => {
+    const response = await api.get(`/supplier-history/${supplierId}`);
+    return response.data;
+  },
+  
+  addTransaction: async (transaction) => {
+    const response = await api.post('/supplier-history', transaction);
+    return response.data;
+  },
+};
+
+// ==================== CUSTOMER HISTORY ====================
+export const customerHistoryService = {
+  getHistory: async (customerId) => {
+    const response = await api.get(`/customer-history/${customerId}`);
+    return response.data;
+  },
+  
+  addOrder: async (orderData) => {
+    const response = await api.post('/customer-history', orderData);
+    return response.data;
+  },
+  
+  updateOrder: async (orderId, orderData) => {
+    const response = await api.patch(`/customer-history/${orderId}`, orderData);
+    return response.data;
+  },
+};

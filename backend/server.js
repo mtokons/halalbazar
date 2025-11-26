@@ -11,6 +11,8 @@ const Supplier = require('./models/Supplier');
 const MenuItem = require('./models/MenuItem');
 const OrderManagement = require('./models/OrderManagement');
 const Inventory = require('./models/Inventory');
+const SupplierHistory = require('./models/SupplierHistory');
+const CustomerOrderHistory = require('./models/CustomerOrderHistory');
 
 const app = express();
 
@@ -347,6 +349,64 @@ app.delete('/api/orders/:id', async (req, res) => {
     res.json({ message: 'Order deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== SUPPLIER HISTORY ====================
+app.get('/api/supplier-history/:supplierId', async (req, res) => {
+  try {
+    const history = await SupplierHistory.find({ supplierId: req.params.supplierId })
+      .sort({ transactionDate: -1 });
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/supplier-history', async (req, res) => {
+  try {
+    const history = new SupplierHistory({
+      historyId: `SUPH-${Date.now()}`,
+      ...req.body
+    });
+    await history.save();
+    res.status(201).json(history);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ==================== CUSTOMER ORDER HISTORY ====================
+app.get('/api/customer-history/:customerId', async (req, res) => {
+  try {
+    const history = await CustomerOrderHistory.find({ customerId: req.params.customerId })
+      .sort({ orderDate: -1 });
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/customer-history', async (req, res) => {
+  try {
+    const history = new CustomerOrderHistory(req.body);
+    await history.save();
+    res.status(201).json(history);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.patch('/api/customer-history/:id', async (req, res) => {
+  try {
+    const history = await CustomerOrderHistory.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updatedAt: new Date() },
+      { new: true }
+    );
+    res.json(history);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 

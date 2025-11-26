@@ -2,10 +2,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');
 require('dotenv').config();
 
+// Models
 const Order = require('./models/Order');
+const Customer = require('./models/Customer');
+const Supplier = require('./models/Supplier');
+const MenuItem = require('./models/MenuItem');
+const OrderManagement = require('./models/OrderManagement');
+const Inventory = require('./models/Inventory');
+const SupplierHistory = require('./models/SupplierHistory');
+const CustomerOrderHistory = require('./models/CustomerOrderHistory');
 
 const app = express();
 
@@ -14,28 +21,289 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files from React build
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URL || 'mongodb://localhost:27017/halalbazar';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/halalbazar';
 
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// Routes
-
-// Health check
+// ==================== HEALTH CHECK ====================
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Server is running',
-    database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+    database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    timestamp: new Date().toISOString()
   });
 });
 
-// Create a new order calculation
+// ==================== CUSTOMERS ====================
+app.get('/api/customers', async (req, res) => {
+  try {
+    const customers = await Customer.find().sort({ createdAt: -1 });
+    res.json(customers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/customers', async (req, res) => {
+  try {
+    const customer = new Customer(req.body);
+    await customer.save();
+    res.status(201).json(customer);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.delete('/api/customers/:id', async (req, res) => {
+  try {
+    await Customer.findOneAndDelete({ customerId: req.params.id });
+    res.json({ message: 'Customer deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== SUPPLIERS ====================
+app.get('/api/suppliers', async (req, res) => {
+  try {
+    const suppliers = await Supplier.find().sort({ createdAt: -1 });
+    res.json(suppliers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/suppliers', async (req, res) => {
+  try {
+    const supplier = new Supplier(req.body);
+    await supplier.save();
+    res.status(201).json(supplier);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.put('/api/suppliers/:id', async (req, res) => {
+  try {
+    const supplier = await Supplier.findOneAndUpdate(
+      { supplierId: req.params.id },
+      req.body,
+      { new: true }
+    );
+    res.json(supplier);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.delete('/api/suppliers/:id', async (req, res) => {
+  try {
+    await Supplier.findOneAndDelete({ supplierId: req.params.id });
+    res.json({ message: 'Supplier deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== MENU ITEMS ====================
+app.get('/api/menu-items', async (req, res) => {
+  try {
+    const items = await MenuItem.find().sort({ createdAt: -1 });
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/menu-items', async (req, res) => {
+  try {
+    const item = new MenuItem(req.body);
+    await item.save();
+    res.status(201).json(item);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.delete('/api/menu-items/:id', async (req, res) => {
+  try {
+    await MenuItem.findOneAndDelete({ menuId: req.params.id });
+    res.json({ message: 'Menu item deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== ORDERS MANAGEMENT ====================
+app.get('/api/orders-management', async (req, res) => {
+  try {
+    const orders = await OrderManagement.find().sort({ placedAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/orders-management', async (req, res) => {
+  try {
+    const order = new OrderManagement(req.body);
+    await order.save();
+    res.status(201).json(order);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.patch('/api/orders-management/:id/status', async (req, res) => {
+  try {
+    const order = await OrderManagement.findOneAndUpdate(
+      { orderId: req.params.id },
+      { 
+        status: req.body.status,
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
+    res.json(order);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ==================== INVENTORY ====================
+app.get('/api/inventory', async (req, res) => {
+  try {
+    const items = await Inventory.find().sort({ itemName: 1 });
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/inventory', async (req, res) => {
+  try {
+    const item = new Inventory(req.body);
+    await item.save();
+    res.status(201).json(item);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.put('/api/inventory/:id', async (req, res) => {
+  try {
+    const item = await Inventory.findOneAndUpdate(
+      { inventoryId: req.params.id },
+      { ...req.body, updatedAt: new Date() },
+      { new: true }
+    );
+    res.json(item);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/inventory/:id/transaction', async (req, res) => {
+  try {
+    const item = await Inventory.findOne({ inventoryId: req.params.id });
+    
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    
+    const { type, quantity, reason } = req.body;
+    
+    if (type === 'in') {
+      item.quantity += quantity;
+    } else if (type === 'out') {
+      item.quantity -= quantity;
+    }
+    
+    item.transactions.push({
+      type,
+      quantity,
+      reason,
+      date: new Date()
+    });
+    
+    item.updatedAt = new Date();
+    await item.save();
+    
+    res.json(item);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.delete('/api/inventory/:id', async (req, res) => {
+  try {
+    await Inventory.findOneAndDelete({ inventoryId: req.params.id });
+    res.json({ message: 'Inventory item deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== REPORTS ====================
+app.get('/api/reports/summary', async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    let query = {};
+    if (startDate && endDate) {
+      query.placedAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+    
+    const orders = await OrderManagement.find(query);
+    
+    const totalSales = orders.reduce((sum, order) => sum + order.totalSellPrice, 0);
+    const totalCost = orders.reduce((sum, order) => sum + order.totalCost, 0);
+    const totalProfit = orders.reduce((sum, order) => sum + order.profit, 0);
+    
+    const statusBreakdown = orders.reduce((acc, order) => {
+      acc[order.status] = (acc[order.status] || 0) + 1;
+      return acc;
+    }, {});
+    
+    res.json({
+      totalOrders: orders.length,
+      totalSales,
+      totalCost,
+      totalProfit,
+      averageOrderValue: orders.length > 0 ? totalSales / orders.length : 0,
+      profitMargin: totalCost > 0 ? (totalProfit / totalCost) * 100 : 0,
+      statusBreakdown,
+      orders: orders.map(order => ({
+        orderId: order.orderId,
+        customerName: order.customerName,
+        orderDate: order.orderDate,
+        status: order.status,
+        totalSellPrice: order.totalSellPrice,
+        profit: order.profit
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== BIRYANI CALCULATOR ====================
+app.get('/api/orders', async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/orders', async (req, res) => {
   try {
     const {
@@ -46,145 +314,104 @@ app.post('/api/orders', async (req, res) => {
       profitMargin
     } = req.body;
 
-    // Validation
     if (!numberOfBiryani || !ingredientCost || !electricityBill || !labourCost || profitMargin === undefined) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Calculate total cost
     const totalCost = parseFloat(ingredientCost) + parseFloat(electricityBill) + parseFloat(labourCost);
-    
-    // Calculate cost per biryani packet
-    const costPerBiryani = totalCost / parseInt(numberOfBiryani);
-    
-    // Calculate selling price with profit margin
-    const sellingPricePerBiryani = costPerBiryani * (1 + parseFloat(profitMargin) / 100);
-    
-    // Calculate total selling price
-    const totalSellingPrice = sellingPricePerBiryani * parseInt(numberOfBiryani);
-    
-    // Calculate profit per order
-    const profitPerOrder = totalSellingPrice - totalCost;
+    const costPerBiryani = totalCost / parseFloat(numberOfBiryani);
+    const profitPerBiryani = costPerBiryani * (parseFloat(profitMargin) / 100);
+    const sellingPrice = costPerBiryani + profitPerBiryani;
+    const profitOrLoss = profitPerBiryani * parseFloat(numberOfBiryani);
 
-    // Create new order
     const order = new Order({
-      numberOfBiryani: parseInt(numberOfBiryani),
+      numberOfBiryani: parseFloat(numberOfBiryani),
       ingredientCost: parseFloat(ingredientCost),
       electricityBill: parseFloat(electricityBill),
       labourCost: parseFloat(labourCost),
       profitMargin: parseFloat(profitMargin),
-      totalCost: parseFloat(totalCost.toFixed(2)),
-      costPerBiryani: parseFloat(costPerBiryani.toFixed(2)),
-      sellingPricePerBiryani: parseFloat(sellingPricePerBiryani.toFixed(2)),
-      totalSellingPrice: parseFloat(totalSellingPrice.toFixed(2)),
-      profitPerOrder: parseFloat(profitPerOrder.toFixed(2))
+      totalCost,
+      costPerBiryani,
+      sellingPrice,
+      profitOrLoss
     });
 
     await order.save();
-
-    res.json({
-      message: 'Order calculated successfully',
-      orderId: order._id,
-      calculation: {
-        numberOfBiryani: order.numberOfBiryani,
-        ingredientCost: order.ingredientCost,
-        electricientCost: order.electricityBill,
-        labourCost: order.labourCost,
-        profitMargin: order.profitMargin,
-        totalCost: order.totalCost.toFixed(2),
-        costPerBiryani: order.costPerBiryani.toFixed(2),
-        sellingPricePerBiryani: order.sellingPricePerBiryani.toFixed(2),
-        totalSellingPrice: order.totalSellingPrice.toFixed(2),
-        profitPerOrder: order.profitPerOrder.toFixed(2)
-      }
-    });
+    res.status(201).json(order);
   } catch (error) {
-    console.error('Error creating order:', error);
-    res.status(500).json({ error: 'Failed to create order' });
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Get all orders
-app.get('/api/orders', async (req, res) => {
-  try {
-    const orders = await Order.find().sort({ createdAt: -1 });
-    
-    const formattedOrders = orders.map(order => ({
-      id: order._id,
-      number_of_biryani: order.numberOfBiryani,
-      ingredient_cost: order.ingredientCost,
-      electricity_bill: order.electricityBill,
-      labour_cost: order.labourCost,
-      profit_margin: order.profitMargin,
-      total_cost: order.totalCost,
-      cost_per_biryani: order.costPerBiryani,
-      selling_price_per_biryani: order.sellingPricePerBiryani,
-      total_selling_price: order.totalSellingPrice,
-      profit_per_order: order.profitPerOrder,
-      created_at: order.createdAt
-    }));
-
-    res.json(formattedOrders);
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    res.status(500).json({ error: 'Failed to fetch orders' });
-  }
-});
-
-// Get a specific order by ID
-app.get('/api/orders/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const order = await Order.findById(id);
-
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
-
-    res.json({
-      id: order._id,
-      number_of_biryani: order.numberOfBiryani,
-      ingredient_cost: order.ingredientCost,
-      electricity_bill: order.electricityBill,
-      labour_cost: order.labourCost,
-      profit_margin: order.profitMargin,
-      total_cost: order.totalCost,
-      cost_per_biryani: order.costPerBiryani,
-      selling_price_per_biryani: order.sellingPricePerBiryani,
-      total_selling_price: order.totalSellingPrice,
-      profit_per_order: order.profitPerOrder,
-      created_at: order.createdAt
-    });
-  } catch (error) {
-    console.error('Error fetching order:', error);
-    res.status(500).json({ error: 'Failed to fetch order' });
-  }
-});
-
-// Delete an order
 app.delete('/api/orders/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const order = await Order.findByIdAndDelete(id);
-
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
-
+    await Order.findByIdAndDelete(req.params.id);
     res.json({ message: 'Order deleted successfully' });
   } catch (error) {
-    console.error('Error deleting order:', error);
-    res.status(500).json({ error: 'Failed to delete order' });
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Serve React app for all other routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+// ==================== SUPPLIER HISTORY ====================
+app.get('/api/supplier-history/:supplierId', async (req, res) => {
+  try {
+    const history = await SupplierHistory.find({ supplierId: req.params.supplierId })
+      .sort({ transactionDate: -1 });
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/supplier-history', async (req, res) => {
+  try {
+    const history = new SupplierHistory({
+      historyId: `SUPH-${Date.now()}`,
+      ...req.body
+    });
+    await history.save();
+    res.status(201).json(history);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ==================== CUSTOMER ORDER HISTORY ====================
+app.get('/api/customer-history/:customerId', async (req, res) => {
+  try {
+    const history = await CustomerOrderHistory.find({ customerId: req.params.customerId })
+      .sort({ orderDate: -1 });
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/customer-history', async (req, res) => {
+  try {
+    const history = new CustomerOrderHistory(req.body);
+    await history.save();
+    res.status(201).json(history);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.patch('/api/customer-history/:id', async (req, res) => {
+  try {
+    const history = await CustomerOrderHistory.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updatedAt: new Date() },
+      { new: true }
+    );
+    res.json(history);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`📡 API URL: http://localhost:${PORT}`);
 });

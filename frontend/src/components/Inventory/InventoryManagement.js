@@ -206,7 +206,7 @@ const InventoryManagement = () => {
             <Card>
               <CardContent>
                 <Typography variant="h6" color="success.main">
-                  ₹{totalValue.toFixed(2)}
+                  €{totalValue.toFixed(2)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Total Value
@@ -337,11 +337,11 @@ const InventoryManagement = () => {
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
-                        ₹{item.purchasePrice.toFixed(2)}
+                        €{item.purchasePrice.toFixed(2)}
                       </TableCell>
                       <TableCell align="right">
                         <Typography variant="body2" fontWeight="medium">
-                          ₹{(item.quantity * item.purchasePrice).toFixed(2)}
+                          €{(item.quantity * item.purchasePrice).toFixed(2)}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -464,8 +464,9 @@ const InventoryManagement = () => {
                   type="number"
                   value={formData.purchasePrice}
                   onChange={(e) => setFormData({...formData, purchasePrice: Number(e.target.value)})}
+                  inputProps={{ step: "0.01", min: "0" }}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">₹</InputAdornment>
+                    startAdornment: <InputAdornment position="start">€</InputAdornment>
                   }}
                 />
               </Grid>

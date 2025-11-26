@@ -120,6 +120,14 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
                   )}
                 </Box>
                 <Box>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => window.location.href = `/suppliers/${supplier.supplierId || supplier.id}`}
+                    sx={{ mr: 1 }}
+                  >
+                    View Profile
+                  </Button>
                   <IconButton
                     size="small"
                     color="primary"
