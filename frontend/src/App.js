@@ -8,6 +8,7 @@ import SupplierManagement from './components/Suppliers/SupplierManagement';
 import OrderManagement from './components/Orders/OrderManagement';
 import InventoryManagement from './components/Inventory/InventoryManagement';
 import HomePage from './components/Home/HomePage';
+import Reporting from './components/Reporting/Reporting';
 
 // Calculator Page Component
 function CalculatorPage() {
@@ -86,6 +87,12 @@ function Navigation() {
           📦 Inventory
         </Link>
         <Link 
+          to="/reporting" 
+          className={isActive('/reporting') ? 'tab-button active' : 'tab-button'}
+        >
+          📈 Reporting
+        </Link>
+        <Link 
           to="/calculator" 
           className={isActive('/calculator') ? 'tab-button active' : 'tab-button'}
         >
@@ -107,6 +114,7 @@ function App() {
           <Route path="/suppliers" element={<SupplierManagement />} />
           <Route path="/orders" element={<OrderManagement />} />
           <Route path="/inventory" element={<InventoryManagement />} />
+          <Route path="/reporting" element={<Reporting />} />
           <Route path="/calculator" element={<CalculatorPage />} />
         </Routes>
       </div>

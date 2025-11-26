@@ -9,24 +9,25 @@ import {
 import { Add as AddIcon } from '@mui/icons-material';
 import SupplierForm from './SupplierForm';
 import SupplierList from './SupplierList';
+import { supplierService } from '../../services/orderService';
 
 const SupplierManagement = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [openForm, setOpenForm] = useState(false);
   const [editSupplier, setEditSupplier] = useState(null);
 
-  // Load suppliers from localStorage on component mount
+  // Load suppliers from API on component mount
   useEffect(() => {
-    const savedSuppliers = localStorage.getItem('suppliers');
-    if (savedSuppliers) {
-      setSuppliers(JSON.parse(savedSuppliers));
-    }
+    const fetchSuppliers = async () => {
+      try {
+        const data = await supplierService.getAll();
+        setSuppliers(data);
+      } catch (error) {
+        console.error('Error loading suppliers:', error);
+      }
+    };
+    fetchSuppliers();
   }, []);
-
-  // Save suppliers to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('suppliers', JSON.stringify(suppliers));
-  }, [suppliers]);
 
   const handleOpenForm = () => {
     setEditSupplier(null);
@@ -38,13 +39,21 @@ const SupplierManagement = () => {
     setEditSupplier(null);
   };
 
-  const handleSaveSupplier = (supplierData) => {
-    if (editSupplier) {
-      // Update existing supplier
-      setSuppliers(suppliers.map(s => s.id === supplierData.id ? supplierData : s));
-    } else {
-      // Add new supplier
-      setSuppliers([...suppliers, supplierData]);
+  const handleSaveSupplier = async (supplierData) => {
+    try {
+      if (editSupplier) {
+        // Update existing supplier
+        const updated = await supplierService.update(supplierData.supplierId || supplierData.id, supplierData);
+        setSuppliers(suppliers.map(s => (s.supplierId || s.id) === (updated.supplierId || updated.id) ? updated : s));
+      } else {
+        // Add new supplier
+        const newSupplier = await supplierService.create(supplierData);
+        setSuppliers([...suppliers, newSupplier]);
+      }
+    } catch (error) {
+      console.error('Error saving supplier:', error);
+      alert('Failed to save supplier');
+      throw error;
     }
   };
 
@@ -53,8 +62,14 @@ const SupplierManagement = () => {
     setOpenForm(true);
   };
 
-  const handleDeleteSupplier = (supplierId) => {
-    setSuppliers(suppliers.filter(s => s.id !== supplierId));
+  const handleDeleteSupplier = async (supplierId) => {
+    try {
+      await supplierService.delete(supplierId);
+      setSuppliers(suppliers.filter(s => (s.supplierId || s.id) !== supplierId));
+    } catch (error) {
+      console.error('Error deleting supplier:', error);
+      alert('Failed to delete supplier');
+    }
   };
 
   return (

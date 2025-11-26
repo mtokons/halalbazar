@@ -102,33 +102,19 @@ const HomePage = () => {
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Logo Section */}
       <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <Box sx={{ mb: 3 }}>
-          <Box
-            component="div"
-            sx={{
-              width: 200,
-              height: 200,
+        <Box sx={{ mb: 2 }}>
+          <img 
+            src="/logo.png" 
+            alt="My Halal Bazar" 
+            style={{
+              width: '250px',
+              height: 'auto',
+              maxWidth: '100%',
               margin: '0 auto',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-              border: '4px solid #d4a574'
+              display: 'block'
             }}
-          >
-            <Typography variant="h2" sx={{ color: '#f5e6d3', fontWeight: 'bold' }}>
-              myhalalbazar.de
-            </Typography>
-          </Box>
+          />
         </Box>
-        <Typography variant="h6" color="text.secondary" sx={{ fontStyle: 'italic', mb: 1 }}>
-          Authentischer Marktplatz | Halal Speisen & Produkte für Deutschland
-        </Typography>
-        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-          Enterprise Resource Planning System
-        </Typography>
       </Box>
 
       {/* Navigation Buttons */}

@@ -106,7 +106,7 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
         </Box>
       ) : (
         filteredSuppliers.map((supplier) => (
-          <Card key={supplier.id} sx={{ mb: 2 }}>
+          <Card key={supplier.supplierId || supplier.id} sx={{ mb: 2 }}>
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
                 <Box>
@@ -133,7 +133,7 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
                     color="error"
                     onClick={() => {
                       if (window.confirm(`Are you sure you want to delete ${supplier.supplierName}?`)) {
-                        onDelete(supplier.id);
+                        onDelete(supplier.supplierId || supplier.id);
                       }
                     }}
                   >

@@ -35,6 +35,7 @@ import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon
 } from '@mui/icons-material';
+import { inventoryService } from '../../services/orderService';
 
 const InventoryManagement = () => {
   const [inventory, setInventory] = useState([]);
@@ -55,31 +56,19 @@ const InventoryManagement = () => {
   const categories = ['All', 'Raw Material', 'Packaging', 'Spices', 'Dairy', 'Meat', 'Vegetables', 'Grains', 'Supplies'];
   const units = ['kg', 'liter', 'piece', 'pack', 'gram', 'box'];
 
-  // Load inventory from localStorage
+  // Load inventory from API
   useEffect(() => {
-    const savedInventory = localStorage.getItem('inventory');
-    if (savedInventory) {
-      setInventory(JSON.parse(savedInventory));
-    } else {
-      // Initialize with sample data
-      const sampleInventory = [
-        { id: 1, itemName: 'Basmati Rice', category: 'Grains', quantity: 50, unit: 'kg', purchasePrice: 120, reorderLevel: 20, supplier: 'Basmati House', lastUpdated: new Date().toISOString() },
-        { id: 2, itemName: 'Chicken', category: 'Meat', quantity: 15, unit: 'kg', purchasePrice: 180, reorderLevel: 10, supplier: 'Khan Meat Suppliers', lastUpdated: new Date().toISOString() },
-        { id: 3, itemName: 'Biryani Masala', category: 'Spices', quantity: 5, unit: 'kg', purchasePrice: 450, reorderLevel: 3, supplier: 'Spice King', lastUpdated: new Date().toISOString() },
-        { id: 4, itemName: 'Packaging Containers', category: 'Packaging', quantity: 200, unit: 'piece', purchasePrice: 5, reorderLevel: 50, supplier: 'Pack Pro', lastUpdated: new Date().toISOString() },
-        { id: 5, itemName: 'Onions', category: 'Vegetables', quantity: 8, unit: 'kg', purchasePrice: 40, reorderLevel: 15, supplier: 'Fresh Farm', lastUpdated: new Date().toISOString() },
-      ];
-      setInventory(sampleInventory);
-      localStorage.setItem('inventory', JSON.stringify(sampleInventory));
-    }
+    const fetchInventory = async () => {
+      try {
+        const data = await inventoryService.getAll();
+        setInventory(data);
+      } catch (error) {
+        console.error('Error loading inventory:', error);
+        setInventory([]);
+      }
+    };
+    fetchInventory();
   }, []);
-
-  // Save inventory to localStorage
-  useEffect(() => {
-    if (inventory.length > 0) {
-      localStorage.setItem('inventory', JSON.stringify(inventory));
-    }
-  }, [inventory]);
 
   const handleOpenDialog = (item = null) => {
     if (item) {
@@ -105,49 +94,61 @@ const InventoryManagement = () => {
     setEditItem(null);
   };
 
-  const handleSaveItem = () => {
+  const handleSaveItem = async () => {
     if (!formData.itemName || formData.quantity < 0) {
       alert('Please fill in all required fields');
       return;
     }
 
-    if (editItem) {
-      // Update existing item
-      setInventory(inventory.map(item =>
-        item.id === editItem.id
-          ? { ...formData, id: editItem.id, lastUpdated: new Date().toISOString() }
-          : item
-      ));
-    } else {
-      // Add new item
-      const newItem = {
-        ...formData,
-        id: Date.now(),
-        lastUpdated: new Date().toISOString()
-      };
-      setInventory([...inventory, newItem]);
+    try {
+      if (editItem) {
+        // Update existing item
+        const updated = await inventoryService.update(editItem.inventoryId || editItem.id, formData);
+        setInventory(inventory.map(item =>
+          (item.inventoryId || item.id) === (editItem.inventoryId || editItem.id) ? updated : item
+        ));
+      } else {
+        // Add new item
+        const newItem = await inventoryService.create(formData);
+        setInventory([...inventory, newItem]);
+      }
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Error saving inventory item:', error);
+      alert('Failed to save inventory item');
     }
-    handleCloseDialog();
   };
 
-  const handleDeleteItem = (itemId) => {
+  const handleDeleteItem = async (itemId) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
-      setInventory(inventory.filter(item => item.id !== itemId));
+      try {
+        await inventoryService.delete(itemId);
+        setInventory(inventory.filter(item => (item.inventoryId || item.id) !== itemId));
+      } catch (error) {
+        console.error('Error deleting inventory item:', error);
+        alert('Failed to delete inventory item');
+      }
     }
   };
 
-  const handleAdjustStock = (itemId, type) => {
+  const handleAdjustStock = async (itemId, type) => {
     const amount = prompt(`Enter ${type === 'add' ? 'quantity to add' : 'quantity to remove'}:`);
     if (amount && !isNaN(amount)) {
-      setInventory(inventory.map(item => {
-        if (item.id === itemId) {
-          const newQuantity = type === 'add'
-            ? item.quantity + Number(amount)
-            : Math.max(0, item.quantity - Number(amount));
-          return { ...item, quantity: newQuantity, lastUpdated: new Date().toISOString() };
-        }
-        return item;
-      }));
+      try {
+        const transaction = {
+          type: type === 'add' ? 'in' : 'out',
+          quantity: Number(amount),
+          reason: type === 'add' ? 'Stock added' : 'Stock removed'
+        };
+        
+        const updated = await inventoryService.addTransaction(itemId, transaction);
+        setInventory(inventory.map(item =>
+          (item.inventoryId || item.id) === itemId ? updated : item
+        ));
+      } catch (error) {
+        console.error('Error adjusting stock:', error);
+        alert('Failed to adjust stock');
+      }
     }
   };
 
@@ -361,7 +362,7 @@ const InventoryManagement = () => {
                         <IconButton
                           size="small"
                           color="success"
-                          onClick={() => handleAdjustStock(item.id, 'add')}
+                          onClick={() => handleAdjustStock(item.inventoryId || item.id, 'add')}
                           title="Add Stock"
                         >
                           <TrendingUpIcon />
@@ -369,7 +370,7 @@ const InventoryManagement = () => {
                         <IconButton
                           size="small"
                           color="warning"
-                          onClick={() => handleAdjustStock(item.id, 'remove')}
+                          onClick={() => handleAdjustStock(item.inventoryId || item.id, 'remove')}
                           title="Remove Stock"
                         >
                           <TrendingDownIcon />
@@ -385,7 +386,7 @@ const InventoryManagement = () => {
                         <IconButton
                           size="small"
                           color="error"
-                          onClick={() => handleDeleteItem(item.id)}
+                          onClick={() => handleDeleteItem(item.inventoryId || item.id)}
                           title="Delete"
                         >
                           <DeleteIcon />
