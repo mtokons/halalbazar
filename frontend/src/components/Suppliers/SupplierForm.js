@@ -431,24 +431,24 @@ const SupplierForm = ({ open, onClose, onSave, editSupplier }) => {
                       <Grid container spacing={1} sx={{ mt: 1 }}>
                         <Grid item xs={6} sm={3}>
                           <Typography variant="caption" color="text.secondary">Base: </Typography>
-                          <Typography variant="body2">₹{product.basePrice}/{product.unit}</Typography>
+                          <Typography variant="body2">€{product.basePrice}/{product.unit}</Typography>
                         </Grid>
                         {product.deliveryPrice && (
                           <Grid item xs={6} sm={3}>
                             <Typography variant="caption" color="text.secondary">With Delivery: </Typography>
-                            <Typography variant="body2">₹{product.deliveryPrice}</Typography>
+                            <Typography variant="body2">€{product.deliveryPrice}</Typography>
                           </Grid>
                         )}
                         {product.b2bPrice && (
                           <Grid item xs={6} sm={3}>
                             <Typography variant="caption" color="text.secondary">B2B: </Typography>
-                            <Typography variant="body2">₹{product.b2bPrice}</Typography>
+                            <Typography variant="body2">€{product.b2bPrice}</Typography>
                           </Grid>
                         )}
                         {product.mrp && (
                           <Grid item xs={6} sm={3}>
                             <Typography variant="caption" color="text.secondary">MRP: </Typography>
-                            <Typography variant="body2">₹{product.mrp}</Typography>
+                            <Typography variant="body2">€{product.mrp}</Typography>
                           </Grid>
                         )}
                       </Grid>

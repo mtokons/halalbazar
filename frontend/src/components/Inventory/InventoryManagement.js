@@ -492,7 +492,7 @@ const InventoryManagement = () => {
                 <Grid item xs={12}>
                   <Box sx={{ p: 2, bgcolor: 'info.light', borderRadius: 1 }}>
                     <Typography variant="subtitle2">
-                      Total Value: ₹{(formData.quantity * formData.purchasePrice).toFixed(2)}
+                      Total Value: €{(formData.quantity * formData.purchasePrice).toFixed(2)}
                     </Typography>
                   </Box>
                 </Grid>

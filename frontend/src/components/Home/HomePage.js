@@ -333,10 +333,10 @@ const HomePage = () => {
 
                         <Box sx={{ width: '100%', mt: 1, display: 'flex', gap: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            Total: <strong>₹{order.sellingPrice?.toFixed(2) || '0.00'}</strong>
+                            Total: <strong>€{order.sellingPrice?.toFixed(2) || '0.00'}</strong>
                           </Typography>
-                          <Typography variant="body2" color="success.main">
-                            Profit: <strong>₹{order.profitAmount?.toFixed(2) || '0.00'}</strong>
+                          <Typography variant="body2" color="text.secondary">
+                            Profit: <strong>€{order.profitAmount?.toFixed(2) || '0.00'}</strong>
                           </Typography>
                         </Box>
                       </ListItem>

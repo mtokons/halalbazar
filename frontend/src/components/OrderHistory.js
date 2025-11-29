@@ -106,7 +106,7 @@ function OrderHistory({ refresh }) {
                   <span>
                     {parseFloat(order.profit_per_order) > 0 ? 'Profit:' : 'Loss:'}
                   </span>
-                  <strong>₹{parseFloat(order.profit_per_order).toFixed(2)}</strong>
+                  <strong>€{parseFloat(order.profit_per_order).toFixed(2)}</strong>
                 </div>
               </div>
 
@@ -115,7 +115,7 @@ function OrderHistory({ refresh }) {
                   Margin: {parseFloat(order.profit_margin)}%
                 </span>
                 <span className="price-per-unit">
-                  ₹{parseFloat(order.selling_price_per_biryani).toFixed(2)} per packet
+                  €{parseFloat(order.selling_price_per_biryani).toFixed(2)} per packet
                 </span>
               </div>
             </div>

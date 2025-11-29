@@ -34,7 +34,7 @@ function ResultDisplay({ result }) {
             {isProfitable ? '💰 Profit per Order' : '⚠️ Loss per Order'}
           </div>
           <div className="result-value profit-value">
-            ₹{result.profitPerOrder}
+            €{result.profitPerOrder}
           </div>
         </div>
       </div>

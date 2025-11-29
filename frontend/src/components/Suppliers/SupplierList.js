@@ -235,26 +235,26 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
                             </TableCell>
                             <TableCell align="right">
                               <Typography variant="body2" fontWeight="bold" color="primary">
-                                ₹{product.basePrice}
+                                €{product.basePrice}
                               </Typography>
                             </TableCell>
                             <TableCell align="right">
-                              {product.deliveryPrice ? `₹${product.deliveryPrice}` : '-'}
+                              {product.deliveryPrice ? `€${product.deliveryPrice}` : '-'}
                             </TableCell>
                             <TableCell align="right">
-                              {product.withoutDeliveryPrice ? `₹${product.withoutDeliveryPrice}` : '-'}
+                              {product.withoutDeliveryPrice ? `€${product.withoutDeliveryPrice}` : '-'}
                             </TableCell>
                             <TableCell align="right">
-                              {product.packagingPrice ? `₹${product.packagingPrice}` : '-'}
+                              {product.packagingPrice ? `€${product.packagingPrice}` : '-'}
                             </TableCell>
                             <TableCell align="right">
-                              {product.withoutPackagingPrice ? `₹${product.withoutPackagingPrice}` : '-'}
+                              {product.withoutPackagingPrice ? `€${product.withoutPackagingPrice}` : '-'}
                             </TableCell>
                             <TableCell align="right">
-                              {product.b2bPrice ? `₹${product.b2bPrice}` : '-'}
+                              {product.b2bPrice ? `€${product.b2bPrice}` : '-'}
                             </TableCell>
                             <TableCell align="right">
-                              {product.mrp ? `₹${product.mrp}` : '-'}
+                              {product.mrp ? `€${product.mrp}` : '-'}
                             </TableCell>
                           </TableRow>
                         ))}
